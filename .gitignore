@@ -1,3 +1,5 @@
+.*
+*.iml
 java-repo-tools
 service-account.json
 
