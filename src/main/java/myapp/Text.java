@@ -22,4 +22,9 @@ public class Text {
     public void setIntent(String intent) {
         this.intent = intent;
     }
+
+    public Text(String text, String intent) {
+        this.text = text;
+        this.intent = intent;
+    }
 }

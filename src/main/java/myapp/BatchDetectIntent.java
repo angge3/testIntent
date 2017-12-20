@@ -1,9 +1,7 @@
 package myapp;
 
 import com.alibaba.fastjson.JSONReader;
-import com.google.cloud.dialogflow.v2beta1.Intent;
-import com.google.cloud.dialogflow.v2beta1.IntentsClient;
-import com.google.cloud.dialogflow.v2beta1.ProjectAgentName;
+import com.google.cloud.dialogflow.v2beta1.*;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -14,15 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by za-chenshaoang on 2017/12/18.
  */
-public class BatchCreateIntent extends HttpServlet{
+public class BatchDetectIntent extends HttpServlet{
     // 上传配置
     private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 3;  // 3MB
     private static final int MAX_FILE_SIZE      = 1024 * 1024 * 40; // 40MB
@@ -105,50 +100,48 @@ public class BatchCreateIntent extends HttpServlet{
                     }
                 }
                 if(projectId != null) {
+                    double total = 0;
+                    double right = 0;
 
-                    //intentTexts
-
-                    try (IntentsClient intentsClient = IntentsClient.create()) {
+                    try (SessionsClient sessionsClient = SessionsClient.create()) {
                         for (Map.Entry<String, List<String>> entry : intentTexts.entrySet()) {
-                            String displayName = entry.getKey();
-                            List<String> txtList = entry.getValue();
-                            // Set the project agent name using the projectID (my-project-id)
-                            ProjectAgentName parent = ProjectAgentName.of(projectId);
+                            String expectedIntent = entry.getKey();
+                            List<String> texts = entry.getValue();
 
-                            // Build the trainingPhrases from the trainingPhrasesParts
-                            List<Intent.TrainingPhrase> trainingPhrases = new ArrayList<>();
-                            for (String trainingPhrase : txtList) {
-                                trainingPhrases.add(
-                                        Intent.TrainingPhrase.newBuilder().addParts(
-                                                Intent.TrainingPhrase.Part.newBuilder().setText(trainingPhrase).build())
-                                                .build());
-                            }
+                            // Set the session name using the sessionId (UUID) and projectID (my-project-id)
+                            SessionName session = SessionName.of(projectId, UUID.randomUUID().toString());
+                            System.out.println("Session Path: " + session.toString());
 
-                            // Build the message texts for the agent's response
-                            Intent.Message message = Intent.Message.newBuilder()
-                                    .setText(
-                                            Intent.Message.Text.newBuilder()
-                                                    .addAllText(new ArrayList<String>()).build()
-                                    ).build();
+                            // Detect intents for each text input
+                            for (String text : texts) {
+                                // Set the text (hello) and language code (en-US) for the query
+                                TextInput.Builder textInput = TextInput.newBuilder().setText(text).setLanguageCode("zh-CN");
 
-                            // Build the intent
-                            Intent intent = Intent.newBuilder()
-                                    .setDisplayName(displayName)
-                                    .addMessages(message)
-                                    .addAllTrainingPhrases(trainingPhrases)
-                                    .build();
+                                // Build the query with the TextInput
+                                QueryInput queryInput = QueryInput.newBuilder().setText(textInput).build();
 
-                            // Performs the create intent request
-                            try {
-                                Intent response = intentsClient.createIntent(parent, intent);
-                                System.out.format("Intent created: %s\n", response);
-                                resp.getWriter().append(response.toString());
-                            }catch (Exception e){
-                                resp.getWriter().append(e.getMessage());
+                                // Performs the detect intent request
+                                DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
+
+                                // Display the query result
+                                QueryResult queryResult = response.getQueryResult();
+
+                                System.out.println("====================");
+                                System.out.format("Query Text: '%s'\n", queryResult.getQueryText());
+                                System.out.format("Detected Intent: %s (confidence: %f)\n",
+                                        queryResult.getIntent().getDisplayName(), queryResult.getIntentDetectionConfidence());
+                                if(queryResult.getIntent().getDisplayName().equalsIgnoreCase(expectedIntent)){
+                                    //识别成功
+                                    resp.getWriter().append(queryResult.getQueryText()+" : "+queryResult.getIntent().getDisplayName());
+                                    right++;
+                                }
+                                total++;
                             }
                         }
+                        resp.getWriter().append("total : "+total);
+                        resp.getWriter().append("right : "+right);
+                        resp.getWriter().append("rate : "+right/total);
                     }
-
                 }else{
                    resp.getWriter().append("projectId为空");
                 }

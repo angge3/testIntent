@@ -21,6 +21,15 @@
         <servlet-name>createIntent</servlet-name>
         <url-pattern>/createIntent</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>detectIntent</servlet-name>
+        <servlet-class>myapp.BatchDetectIntent</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>detectIntent</servlet-name>
+        <url-pattern>/detectIntent</url-pattern>
+    </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
