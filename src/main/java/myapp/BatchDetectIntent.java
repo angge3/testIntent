@@ -114,29 +114,34 @@ public class BatchDetectIntent extends HttpServlet{
 
                             // Detect intents for each text input
                             for (String text : texts) {
-                                // Set the text (hello) and language code (en-US) for the query
-                                TextInput.Builder textInput = TextInput.newBuilder().setText(text).setLanguageCode("zh-CN");
+                                try {
+                                    // Set the text (hello) and language code (en-US) for the query
+                                    TextInput.Builder textInput = TextInput.newBuilder().setText(text).setLanguageCode("zh-CN");
 
-                                // Build the query with the TextInput
-                                QueryInput queryInput = QueryInput.newBuilder().setText(textInput).build();
+                                    // Build the query with the TextInput
+                                    QueryInput queryInput = QueryInput.newBuilder().setText(textInput).build();
 
-                                // Performs the detect intent request
-                                DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
+                                    // Performs the detect intent request
+                                    DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
 
-                                // Display the query result
-                                QueryResult queryResult = response.getQueryResult();
+                                    // Display the query result
+                                    QueryResult queryResult = response.getQueryResult();
 
-                                System.out.println("====================");
-                                System.out.format("Query Text: '%s'\n", queryResult.getQueryText());
-                                System.out.format("Detected Intent: %s (confidence: %f)\n",
-                                        queryResult.getIntent().getDisplayName(), queryResult.getIntentDetectionConfidence());
-                                if(queryResult.getIntent().getDisplayName().equalsIgnoreCase(expectedIntent)){
-                                    //识别成功
-                                    resp.getWriter().append(queryResult.getQueryText()+" : "+queryResult.getIntent().getDisplayName());
-                                    right++;
+                                    System.out.println("====================");
+                                    System.out.format("Query Text: '%s'\n", queryResult.getQueryText());
+                                    System.out.format("Detected Intent: %s (confidence: %f)\n",
+                                            queryResult.getIntent().getDisplayName(), queryResult.getIntentDetectionConfidence());
+                                    if (queryResult.getIntent().getDisplayName().equalsIgnoreCase(expectedIntent)) {
+                                        //识别成功
+                                        resp.getWriter().append(queryResult.getQueryText() + " : " + queryResult.getIntent().getDisplayName());
+                                        right++;
+                                    }
+                                    total++;
+                                    Thread.sleep(500);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                    total++;
                                 }
-                                total++;
-                                Thread.sleep(500);
                             }
                         }
                         resp.getWriter().append("total : "+total);
