@@ -113,23 +113,29 @@ public class BatchCreateIntent extends HttpServlet{
                         for(TextUnit textUnit : entry.getValue()){
                             if(textUnit.getEntities()!=null) {
                                 for (Entity entity : textUnit.getEntities()) {
-                                    try {
-                                        EntityType entityType = EntityTypeManagement.createEntityType(entity.getEntity(), projectId, "KIND_MAP");
-                                        entityTypeMap.put(entity.getEntity(),entityType.getNameAsEntityTypeName().getEntityType());
-
-                                    }catch (Exception e){
-                                        e.printStackTrace();
-                                    }
+                                    entityTypeMap.put(entity.getEntity(),null);
                                 }
                             }
                         }
                     }
+
+                    for(String s: entityTypeMap.keySet()){
+                        try {
+                            EntityType entityType = EntityTypeManagement.createEntityType(s, projectId, "KIND_MAP");
+                            entityTypeMap.put(s,entityType.getNameAsEntityTypeName().getEntityType());
+                            Thread.sleep(400);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+
                     for (Map.Entry<String, List<TextUnit>> entry : intentTexts.entrySet()) {
                         for(TextUnit textUnit : entry.getValue()){
                             if(textUnit.getEntities()!=null) {
                                 for (Entity entity : textUnit.getEntities()) {
                                     try {
                                         EntityManagement.createEntity(projectId, entityTypeMap.get(entity.getEntity()), entity.getValue(), new ArrayList<String>());
+                                        Thread.sleep(400);
                                     }catch (Exception e){
                                         e.printStackTrace();
                                     }
