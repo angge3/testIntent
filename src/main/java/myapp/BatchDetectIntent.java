@@ -136,6 +136,7 @@ public class BatchDetectIntent extends HttpServlet{
                                     right++;
                                 }
                                 total++;
+                                Thread.sleep(500);
                             }
                         }
                         resp.getWriter().append("total : "+total);
