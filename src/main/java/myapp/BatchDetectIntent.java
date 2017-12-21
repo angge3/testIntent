@@ -144,6 +144,9 @@ public class BatchDetectIntent extends HttpServlet{
                                 }
                             }
                         }
+                        System.out.println("total : "+total);
+                        System.out.println("right : "+right);
+                        System.out.println("rate : "+right/total);
                         resp.getWriter().append("total : "+total);
                         resp.getWriter().append("right : "+right);
                         resp.getWriter().append("rate : "+right/total);
