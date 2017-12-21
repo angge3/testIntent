@@ -1,6 +1,7 @@
 package myapp;
 
 import com.alibaba.fastjson.JSONReader;
+import com.google.cloud.dialogflow.v2beta1.EntityType;
 import com.google.cloud.dialogflow.v2beta1.Intent;
 import com.google.cloud.dialogflow.v2beta1.IntentsClient;
 import com.google.cloud.dialogflow.v2beta1.ProjectAgentName;
@@ -70,7 +71,7 @@ public class BatchCreateIntent extends HttpServlet{
             String projectId = null;
 
             if (formItems != null && formItems.size() > 0) {
-                Map<String,List<String>> intentTexts = new HashMap<>();
+                Map<String,List<TextUnit>> intentTexts = new HashMap<>();
                 // 迭代表单数据
                 for (FileItem item : formItems) {
                     // 处理不在表单中的字段
@@ -86,14 +87,14 @@ public class BatchCreateIntent extends HttpServlet{
                         JSONReader jsonReader = new JSONReader(new FileReader(storeFile));
                         jsonReader.startArray();
                         while (jsonReader.hasNext()){
-                            Text text = jsonReader.readObject(Text.class);
+                            final Text text = jsonReader.readObject(Text.class);
                             String intent = text.getIntent();
                             final String content = text.getText();
                             if(intentTexts.containsKey(intent)){
-                                intentTexts.get(intent).add(content);
+                                intentTexts.get(intent).add(new TextUnit(content,text.getEntities()));
                             }else{
-                                intentTexts.put(intent,new ArrayList<String>(){{
-                                    add(content);
+                                intentTexts.put(intent,new ArrayList<TextUnit>(){{
+                                    add(new TextUnit(content,text.getEntities()));
                                 }});
                             }
                         }
@@ -106,21 +107,50 @@ public class BatchCreateIntent extends HttpServlet{
                 }
                 if(projectId != null) {
 
-                    //intentTexts
+                    //创建实体
+                    Map<String,String> entityTypeMap = new HashMap<>();
+                    for (Map.Entry<String, List<TextUnit>> entry : intentTexts.entrySet()) {
+                        for(TextUnit textUnit : entry.getValue()){
+                            if(textUnit.getEntities()!=null) {
+                                for (Entity entity : textUnit.getEntities()) {
+                                    try {
+                                        EntityType entityType = EntityTypeManagement.createEntityType(entity.getEntity(), projectId, "KIND_MAP");
+                                        entityTypeMap.put(entity.getEntity(),entityType.getNameAsEntityTypeName().getEntityType());
+
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    for (Map.Entry<String, List<TextUnit>> entry : intentTexts.entrySet()) {
+                        for(TextUnit textUnit : entry.getValue()){
+                            if(textUnit.getEntities()!=null) {
+                                for (Entity entity : textUnit.getEntities()) {
+                                    try {
+                                        EntityManagement.createEntity(projectId, entityTypeMap.get(entity.getEntity()), entity.getValue(), new ArrayList<String>());
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     try (IntentsClient intentsClient = IntentsClient.create()) {
-                        for (Map.Entry<String, List<String>> entry : intentTexts.entrySet()) {
+                        for (Map.Entry<String, List<TextUnit>> entry : intentTexts.entrySet()) {
                             String displayName = entry.getKey();
-                            List<String> txtList = entry.getValue();
+                            List<TextUnit> txtList = entry.getValue();
                             // Set the project agent name using the projectID (my-project-id)
                             ProjectAgentName parent = ProjectAgentName.of(projectId);
 
                             // Build the trainingPhrases from the trainingPhrasesParts
                             List<Intent.TrainingPhrase> trainingPhrases = new ArrayList<>();
-                            for (String trainingPhrase : txtList) {
+                            for (TextUnit trainingPhrase : txtList) {
                                 trainingPhrases.add(
                                         Intent.TrainingPhrase.newBuilder().addParts(
-                                                Intent.TrainingPhrase.Part.newBuilder().setText(trainingPhrase).build())
+                                                Intent.TrainingPhrase.Part.newBuilder().setText(trainingPhrase.getText()).build())
                                                 .build());
                             }
 

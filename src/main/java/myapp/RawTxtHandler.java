@@ -14,24 +14,24 @@ import java.util.*;
  */
 public class RawTxtHandler {
     public static void main(String args[]) throws IOException {
-        JSONReader jsonReader = new JSONReader(new FileReader("d://usersays.json"));
+        JSONReader jsonReader = new JSONReader(new FileReader("d://usersays2.json"));
         jsonReader.startArray();
-        Map<String,List<String>> intentTexts = new HashMap<>();
-        Map<String,List<String>> trainTexts = new HashMap<>();
-        Map<String,List<String>> testTexts = new HashMap<>();
+        Map<String,List<TextUnit>> intentTexts = new HashMap<>();
+        Map<String,List<TextUnit>> trainTexts = new HashMap<>();
+        Map<String,List<TextUnit>> testTexts = new HashMap<>();
 
         int total = 0;
         int train = 0;
         int test = 0;
         while (jsonReader.hasNext()){
-            Text text = jsonReader.readObject(Text.class);
+            final Text text = jsonReader.readObject(Text.class);
             String intent = text.getIntent();
             final String content = text.getText();
             if(intentTexts.containsKey(intent)){
-                intentTexts.get(intent).add(content);
+                intentTexts.get(intent).add(new TextUnit(content,text.getEntities()));
             }else{
-                intentTexts.put(intent,new ArrayList<String>(){{
-                    add(content);
+                intentTexts.put(intent,new ArrayList<TextUnit>(){{
+                    add(new TextUnit(content,text.getEntities()));
                 }});
             }
 
@@ -39,13 +39,13 @@ public class RawTxtHandler {
         jsonReader.endArray();
         jsonReader.close();
         Set<String> removedKey = new HashSet<>();
-        List<String> helloStrs = intentTexts.get("Hello");
-        List<String> cuted = helloStrs.subList(0, (int) (helloStrs.size()*0.2));
+        List<TextUnit> helloStrs = intentTexts.get("Hello");
+        List<TextUnit> cuted = helloStrs.subList(0, (int) (helloStrs.size()*0.2));
         intentTexts.put("Hello",cuted);
 
-        for(Map.Entry<String,List<String>> entry : intentTexts.entrySet()){
+        for(Map.Entry<String,List<TextUnit>> entry : intentTexts.entrySet()){
             String intent = entry.getKey();
-            List<String> texts = entry.getValue();
+            List<TextUnit> texts = entry.getValue();
 
             if(texts.size()<10){
                 removedKey.add(intent);
@@ -68,7 +68,7 @@ public class RawTxtHandler {
             intentTexts.remove(key);
         }
 
-        for(Map.Entry<String,List<String>> entry : intentTexts.entrySet()){
+        for(Map.Entry<String,List<TextUnit>> entry : intentTexts.entrySet()){
             total += entry.getValue().size();
         }
 
@@ -76,10 +76,10 @@ public class RawTxtHandler {
         JSONWriter writer = new JSONWriter(new FileWriter("d:/trainTexts.json"));
         writer.config(SerializerFeature.PrettyFormat,true);
         writer.startArray();
-        for(Map.Entry<String,List<String>> entry : trainTexts.entrySet()){
+        for(Map.Entry<String,List<TextUnit>> entry : trainTexts.entrySet()){
 
-            for(String s : entry.getValue()) {
-                writer.writeObject(new Text(s,entry.getKey()));
+            for(TextUnit s : entry.getValue()) {
+                writer.writeObject(new Text(s.getText(),entry.getKey(),s.getEntities()));
                 train++;
             }
 
@@ -90,10 +90,10 @@ public class RawTxtHandler {
         JSONWriter writer2 = new JSONWriter(new FileWriter("d:/testTexts.json"));
         writer2.config(SerializerFeature.PrettyFormat,true);
         writer2.startArray();
-        for(Map.Entry<String,List<String>> entry : testTexts.entrySet()){
+        for(Map.Entry<String,List<TextUnit>> entry : testTexts.entrySet()){
 
-            for(String s : entry.getValue()) {
-                writer2.writeObject(new Text(s,entry.getKey()));
+            for(TextUnit s : entry.getValue()) {
+                writer2.writeObject(new Text(s.getText(),entry.getKey(),s.getEntities()));
                 test++;
             }
 
