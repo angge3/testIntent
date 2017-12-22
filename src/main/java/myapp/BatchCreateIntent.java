@@ -164,10 +164,10 @@ public class BatchCreateIntent extends HttpServlet{
                                         String first = "";
                                         String last = "";
                                         if(start > 0){
-                                            first = value.substring(0,start);
+                                            first = text.substring(0,start);
                                         }
-                                        if(end<value.length()){
-                                            last = value.substring(end);
+                                        if(end<text.length()){
+                                            last = text.substring(end);
                                         }
                                         trainingPhrase.setText(first+" "+value+" "+last);
                                     }
