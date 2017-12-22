@@ -16,21 +16,40 @@
 
 package myapp;
 
+import com.google.cloud.dialogflow.v2beta1.Intent;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 public class IntentOne extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws IOException {
     try {
-      IntentManagement.createIntent("testIntent","test-1b8b7",new ArrayList<String>(){{
-          add("众安保险有多少人");
-          add("我要买国民医保尊享e生医疗险");
-      }},new ArrayList<String>());
+      List<Intent.TrainingPhrase> trainingPhrases = new ArrayList<>();
+
+      Intent.TrainingPhrase.Part part1 = Intent.TrainingPhrase.Part.newBuilder().setEntityType("@check")
+              .setText("超声").setAlias("超声").build();
+
+      Intent.TrainingPhrase.Part part2 = Intent.TrainingPhrase.Part.newBuilder()
+              .setText("检查能报销不").build();
+      trainingPhrases.add(Intent.TrainingPhrase.newBuilder().addParts(part1).addParts(part2).build());
+
+      part1 = Intent.TrainingPhrase.Part.newBuilder().setEntityType("@check").setAlias("胃镜")
+              .setText("胃镜").build();
+
+      part2 = Intent.TrainingPhrase.Part.newBuilder()
+              .setText("检查能报销不").build();
+      trainingPhrases.add(Intent.TrainingPhrase.newBuilder().addParts(part1).addParts(part2).build());
+
+      Intent intent = Intent.newBuilder()
+              .setDisplayName("testIntent")
+              .addAllTrainingPhrases(trainingPhrases)
+              .setMlEnabled(true)
+              .build();
     } catch (Exception e) {
       e.printStackTrace();
     }

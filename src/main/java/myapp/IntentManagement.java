@@ -103,7 +103,6 @@ public class IntentManagement {
           .setDisplayName(displayName)
           .addMessages(message)
           .addAllTrainingPhrases(trainingPhrases)
-          .setMlEnabled(true)
           .build();
 
       // Performs the create intent request
