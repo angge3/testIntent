@@ -198,6 +198,8 @@ public class BatchCreateIntent extends HttpServlet{
                                                     .setText(word).build());
                                         }
                                     }
+                                }else{
+                                    partList.add(Intent.TrainingPhrase.Part.newBuilder().setText(trainingPhrase.getText()).build());
                                 }
                                 trainingPhrases.add(Intent.TrainingPhrase.newBuilder().addAllParts(partList).build());
                             }
