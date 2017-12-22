@@ -151,7 +151,6 @@ public class BatchCreateIntent extends HttpServlet{
                             // Build the trainingPhrases from the trainingPhrasesParts
                             List<Intent.TrainingPhrase> trainingPhrases = new ArrayList<>();
                             for (TextUnit trainingPhrase : txtList) {
-                                Intent.TrainingPhrase.Builder builder = Intent.TrainingPhrase.newBuilder();
                                 List<Entity> entities = trainingPhrase.getEntities();
 
 
