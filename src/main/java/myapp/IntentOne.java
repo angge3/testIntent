@@ -34,13 +34,13 @@ public class IntentOne extends HttpServlet {
       List<Intent.TrainingPhrase> trainingPhrases = new ArrayList<>();
 
       Intent.TrainingPhrase.Part part1 = Intent.TrainingPhrase.Part.newBuilder().setEntityType("@check")
-              .setText("超声").setAlias("超声").setUserDefined(true).build();
+              .setText("超声").setAlias("check").setUserDefined(true).build();
 
       Intent.TrainingPhrase.Part part2 = Intent.TrainingPhrase.Part.newBuilder()
               .setText("检查能报销不").build();
       trainingPhrases.add(Intent.TrainingPhrase.newBuilder().addParts(part1).addParts(part2).build());
 
-      part1 = Intent.TrainingPhrase.Part.newBuilder().setEntityType("@check").setAlias("胃镜").setUserDefined(true)
+      part1 = Intent.TrainingPhrase.Part.newBuilder().setEntityType("@check").setAlias("check").setUserDefined(true)
               .setText("胃镜").build();
 
       part2 = Intent.TrainingPhrase.Part.newBuilder()
