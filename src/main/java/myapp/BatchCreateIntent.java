@@ -177,7 +177,11 @@ public class BatchCreateIntent extends HttpServlet{
                                     }
                                     System.out.println(trainingPhrase.getText());
                                     String [] words = trainingPhrase.getText().split(" ");
+                                    System.out.println("words的长度: "+words.length);
                                     for(String word: words){
+                                        if(word.length() == 0){
+                                            continue;
+                                        }
                                         boolean find = false;
                                         for(Entity entity : entities){
                                             if(entity.getValue().equals(word)){
