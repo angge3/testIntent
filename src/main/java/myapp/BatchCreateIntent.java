@@ -162,6 +162,9 @@ public class BatchCreateIntent extends HttpServlet{
                                         String value = entity.getValue();
                                         int start = text.indexOf(value);
                                         int end = start + value.length();
+                                        System.out.println(text);
+                                        System.out.println("start:" + start);
+                                        System.out.println("end:" + end);
                                         String first = "";
                                         String last = "";
                                         if(start > 0){
@@ -172,6 +175,7 @@ public class BatchCreateIntent extends HttpServlet{
                                         }
                                         trainingPhrase.setText(first+" "+value+" "+last);
                                     }
+                                    System.out.println(trainingPhrase.getText());
                                     String [] words = trainingPhrase.getText().split(" ");
                                     for(String word: words){
                                         for(Entity entity : entities){
