@@ -86,7 +86,7 @@ public class IntentManagement {
       List<TrainingPhrase> trainingPhrases = new ArrayList<>();
       List<Part> parts = new ArrayList<>();
       for(String s : trainingPhrasesParts){
-         parts.add(Part.newBuilder().setText(s).build());
+         parts.add(Part.newBuilder().setText(s).setEntityType("332d8a6b-2713-4ca9-9470-379bbe020ff6").build());
       }
       trainingPhrases.add(
             TrainingPhrase.newBuilder().addAllParts(parts)
