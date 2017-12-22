@@ -193,7 +193,7 @@ public class BatchCreateIntent extends HttpServlet{
                                 }
                                 trainingPhrases.add(Intent.TrainingPhrase.newBuilder().addAllParts(partList).build());
                             }
-
+                            System.out.println(trainingPhrases);
                             // Build the message texts for the agent's response
                             Intent.Message message = Intent.Message.newBuilder()
                                     .setText(
