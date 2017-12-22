@@ -30,6 +30,15 @@
         <servlet-name>detectIntent</servlet-name>
         <url-pattern>/detectIntent</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>intentOne</servlet-name>
+        <servlet-class>myapp.IntentOne</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>intentOne</servlet-name>
+        <url-pattern>/intentOne</url-pattern>
+    </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
