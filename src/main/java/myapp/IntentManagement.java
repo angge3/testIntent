@@ -84,14 +84,12 @@ public class IntentManagement {
 
       // Build the trainingPhrases from the trainingPhrasesParts
       List<TrainingPhrase> trainingPhrases = new ArrayList<>();
-      List<Part> parts = new ArrayList<>();
-      for(String s : trainingPhrasesParts){
-         parts.add(Part.newBuilder().setText(s).setEntityType("@company").setUserDefined(true).build());
-      }
-      trainingPhrases.add(
-            TrainingPhrase.newBuilder().addAllParts(parts)
-                    .setType(TrainingPhrase.Type.EXAMPLE)
+      for (String trainingPhrase : trainingPhrasesParts) {
+        trainingPhrases.add(
+            TrainingPhrase.newBuilder().addParts(
+                    Part.newBuilder().setText(trainingPhrase).build())
                 .build());
+      }
 
       // Build the message texts for the agent's response
       Message message = Message.newBuilder()

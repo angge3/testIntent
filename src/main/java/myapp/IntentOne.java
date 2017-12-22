@@ -28,8 +28,8 @@ public class IntentOne extends HttpServlet {
       throws IOException {
     try {
       IntentManagement.createIntent("testIntent","test-1b8b7",new ArrayList<String>(){{
-          add("众安保险");
-          add("有多少人");
+          add("众安保险有多少人");
+          add("我要买国民医保尊享e生医疗险");
       }},new ArrayList<String>());
     } catch (Exception e) {
       e.printStackTrace();
