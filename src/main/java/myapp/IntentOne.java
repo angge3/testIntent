@@ -50,6 +50,7 @@ public class IntentOne extends HttpServlet {
               .addAllTrainingPhrases(trainingPhrases)
               .setMlEnabled(true)
               .build();
+      System.out.println(intent);
     } catch (Exception e) {
       e.printStackTrace();
     }
