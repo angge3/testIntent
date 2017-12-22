@@ -178,17 +178,21 @@ public class BatchCreateIntent extends HttpServlet{
                                     System.out.println(trainingPhrase.getText());
                                     String [] words = trainingPhrase.getText().split(" ");
                                     for(String word: words){
+                                        boolean find = false;
                                         for(Entity entity : entities){
                                             if(entity.getValue().equals(word)){
                                                 partList.add(Intent.TrainingPhrase.Part.newBuilder()
                                                 .setUserDefined(true).setEntityType("@"+entity.getEntity())
                                                 .setAlias(entity.getEntity())
                                                 .setText(word).build());
+                                                find = true;
                                                 break;
                                             }
                                         }
-                                        partList.add(Intent.TrainingPhrase.Part.newBuilder()
-                                        .setText(word).build());
+                                        if(!find) {
+                                            partList.add(Intent.TrainingPhrase.Part.newBuilder()
+                                                    .setText(word).build());
+                                        }
                                     }
                                 }
                                 trainingPhrases.add(Intent.TrainingPhrase.newBuilder().addAllParts(partList).build());
