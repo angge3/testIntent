@@ -17,6 +17,8 @@
 package myapp;
 
 import com.google.cloud.dialogflow.v2beta1.Intent;
+import com.google.cloud.dialogflow.v2beta1.IntentsClient;
+import com.google.cloud.dialogflow.v2beta1.ProjectAgentName;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +52,11 @@ public class IntentOne extends HttpServlet {
               .addAllTrainingPhrases(trainingPhrases)
               .setMlEnabled(true)
               .build();
-      System.out.println(intent);
+      try (IntentsClient intentsClient = IntentsClient.create()) {
+        Intent intent1 = intentsClient.createIntent(ProjectAgentName.of("test-1b8b7"),intent);
+        System.out.println(intent1);
+      }
+
     } catch (Exception e) {
       e.printStackTrace();
     }
