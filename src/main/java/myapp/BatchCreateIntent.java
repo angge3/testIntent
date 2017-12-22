@@ -15,10 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by za-chenshaoang on 2017/12/18.
@@ -154,10 +151,43 @@ public class BatchCreateIntent extends HttpServlet{
                             // Build the trainingPhrases from the trainingPhrasesParts
                             List<Intent.TrainingPhrase> trainingPhrases = new ArrayList<>();
                             for (TextUnit trainingPhrase : txtList) {
-                                trainingPhrases.add(
-                                        Intent.TrainingPhrase.newBuilder().addParts(
-                                                Intent.TrainingPhrase.Part.newBuilder().setText(trainingPhrase.getText()).build())
-                                                .build());
+                                Intent.TrainingPhrase.Builder builder = Intent.TrainingPhrase.newBuilder();
+                                List<Entity> entities = trainingPhrase.getEntities();
+
+
+                                List<Intent.TrainingPhrase.Part>  partList = new ArrayList<>();
+                                if(entities !=null){
+                                    for(Entity entity : entities){
+                                        String text = trainingPhrase.getText();
+                                        String value = entity.getValue();
+                                        int start = text.indexOf(value);
+                                        int end = start + value.length();
+                                        String first = "";
+                                        String last = "";
+                                        if(start > 0){
+                                            first = value.substring(0,start);
+                                        }
+                                        if(end<value.length()){
+                                            last = value.substring(end);
+                                        }
+                                        trainingPhrase.setText(first+" "+value+" "+last);
+                                    }
+                                    String [] words = trainingPhrase.getText().split(" ");
+                                    for(String word: words){
+                                        for(Entity entity : entities){
+                                            if(entity.getValue().equals(word)){
+                                                partList.add(Intent.TrainingPhrase.Part.newBuilder()
+                                                .setUserDefined(true).setEntityType("@"+entity.getEntity())
+                                                .setAlias(entity.getEntity())
+                                                .setText(word).build());
+                                                break;
+                                            }
+                                        }
+                                        partList.add(Intent.TrainingPhrase.Part.newBuilder()
+                                        .setText(word).build());
+                                    }
+                                }
+                                trainingPhrases.add(Intent.TrainingPhrase.newBuilder().addAllParts(partList).build());
                             }
 
                             // Build the message texts for the agent's response
@@ -172,6 +202,7 @@ public class BatchCreateIntent extends HttpServlet{
                                     .setDisplayName(displayName)
                                     .addMessages(message)
                                     .addAllTrainingPhrases(trainingPhrases)
+                                    .setMlEnabled(true)
                                     .build();
 
                             // Performs the create intent request

@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class RawTxtHandler {
     public static void main(String args[]) throws IOException {
-        JSONReader jsonReader = new JSONReader(new FileReader("d://usersays2.json"));
+        JSONReader jsonReader = new JSONReader(new FileReader("d://usersays_handled.json"));
         jsonReader.startArray();
         Map<String,List<TextUnit>> intentTexts = new HashMap<>();
         Map<String,List<TextUnit>> trainTexts = new HashMap<>();
