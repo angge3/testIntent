@@ -115,7 +115,7 @@ public class BatchCreateIntent extends HttpServlet{
                             }
                         }
                     }
-
+                    /*
                     for(String s: entityTypeMap.keySet()){
                         try {
                             EntityType entityType = EntityTypeManagement.createEntityType(s, projectId, "KIND_MAP");
@@ -140,6 +140,7 @@ public class BatchCreateIntent extends HttpServlet{
                             }
                         }
                     }
+                    */
 
                     try (IntentsClient intentsClient = IntentsClient.create()) {
                         for (Map.Entry<String, List<TextUnit>> entry : intentTexts.entrySet()) {
